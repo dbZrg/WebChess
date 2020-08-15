@@ -1,0 +1,305 @@
+﻿@page
+@model WebChess.Pages.VsAiModel
+@{
+    ViewData["Title"] = "VsAi";
+}
+
+
+@Html.AntiForgeryToken()
+<div class="row">
+    <div class="col-sm-8">
+        <div class="row">
+            <div class="col flex">
+                <h2>Stockfish</h2><div id="oppIcon" class="circle"></div>
+            </div>
+            <div class="col">
+                <h3 class="player2clock">5:01</h3>
+            </div>
+        </div>
+        <div id="myBoard" style="width: 100%"></div>
+        <div class="row">
+            <div class="col flex">
+                <h2>Player</h2><div id="playerIcon" class="circle"></div>
+            </div>
+            <div class="col">
+                <h3 class="player1clock">5:01</h3>
+            </div>
+
+
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="row">
+            <div class="col-sm">
+                <button id="back" type="button" class="btn btn-primary btn-lg btn-block">Takeback</button>
+            </div>
+            <div class="col-sm">
+                <button id="newGame" type="button" class="btn btn-primary btn-lg btn-block">New Game</button>
+            </div>
+
+        </div>
+
+        <div id="movesContainer" class="row">
+            <div id="moveNum" class="col-1">
+
+            </div>
+            <div id="white" class="col moveCont">
+
+            </div>
+            <div id="black" class="col moveCont">
+
+            </div>
+
+        </div>
+
+
+    </div>
+</div>
+
+
+@section scripts {
+    <script src="~/js/chessboard-1.0.0.js"></script>
+    <script src="~/js/chess.js"></script>
+    <script>
+
+        var WhiteToMove = true;
+        var counter = 0;
+        var movesFen = [];
+        var board = null
+        var game = new Chess()
+
+        $("#movesContainer .moveCont").on("click", "div", function (event) {
+            var Id = jQuery(this).attr("id");
+            $('.movesNot').each(function () {
+                let elem = $(this);
+                elem.css('background-color', 'white');
+            });
+            $(this).css('background-color', 'grey');
+
+            Id = Id.slice(0, -1);
+            board.position(movesFen[Id]);
+
+
+        });
+
+        $("#back").click(function () {
+            if (counter > 0) {
+                var playerToMove = game.turn();
+                game.undo();
+                board.position(game.fen())
+                movesFen.pop();
+                counter--;
+
+                if (playerToMove == "w") {
+                    $('#black div').last().remove();
+                    $('#white div').last().css('background-color', 'grey');
+                }
+                else {
+                    $('#white div').last().remove();
+                    $('#moveNum div').last().remove();
+                    $('#black div').last().css('background-color', 'grey');
+                }
+            }
+        });
+
+        $("#newGame").click(function () {
+            board = Chessboard('myBoard', config)
+            game = new Chess()
+            movesFen = []
+            counter = 0;
+            $("#white").empty();
+            $("#black").empty();
+            $("#moveNum").empty();
+            timer1 = "5:01";
+            timer2 = "5:01";
+            $("#oppIcon").css('background-color', 'grey');
+            $("#playerIcon").css('background-color', 'green');
+            $('.player1clock').html(timer1);
+            $('.player2clock').html(timer2);
+        });
+
+        var timer1 = "5:01";
+        var timer2 = "5:01";
+        var interval = setInterval(function () {
+            var playerToMove = game.turn();
+            if (playerToMove == "w") {
+
+                var timer = timer1.split(':');
+                //by parsing integer, I avoid all extra string processing
+                var minutes = parseInt(timer[0], 10);
+                var seconds = parseInt(timer[1], 10);
+                --seconds;
+                minutes = (seconds < 0) ? --minutes : minutes;
+                if (minutes < 0) clearInterval(interval);
+                seconds = (seconds < 0) ? 59 : seconds;
+                seconds = (seconds < 10) ? '0' + seconds : seconds;
+                //minutes = (minutes < 10) ?  minutes : minutes;
+                $('.player1clock').html(minutes + ':' + seconds);
+                timer1 = minutes + ':' + seconds;
+            }
+            else {
+                var timer = timer2.split(':');
+                //by parsing integer, I avoid all extra string processing
+                var minutes = parseInt(timer[0], 10);
+                var seconds = parseInt(timer[1], 10);
+                --seconds;
+                minutes = (seconds < 0) ? --minutes : minutes;
+                if (minutes < 0) clearInterval(interval);
+                seconds = (seconds < 0) ? 59 : seconds;
+                seconds = (seconds < 10) ? '0' + seconds : seconds;
+                //minutes = (minutes < 10) ?  minutes : minutes;
+                $('.player2clock').html(minutes + ':' + seconds);
+                timer2 = minutes + ':' + seconds;
+
+            }
+
+        }, 1000);
+
+        function onChange(oldPos, newPos) {
+
+            //if current board position is last )
+            if (game.turn() == "b") {
+                $("#oppIcon").css('background-color', 'green');
+                $("#playerIcon").css('background-color', 'grey');
+            }
+            else {
+                $("#oppIcon").css('background-color', 'grey');
+                $("#playerIcon").css('background-color', 'green');
+
+            }
+
+
+        }
+
+        function onDragStart(source, piece, position, orientation) {
+            // do not pick up pieces if the game is over
+            if (game.game_over()) return false
+
+            // only pick up pieces for White
+            if (piece.search(/^b/) !== -1) return false
+        }
+
+        function makeRandomMove() {
+            var possibleMoves = game.moves()
+
+            // game over
+            if (possibleMoves.length === 0) return
+
+            var randomIdx = Math.floor(Math.random() * possibleMoves.length)
+            var move = game.move(possibleMoves[randomIdx])
+            board.position(game.fen())
+            
+            jQuery('<div/>', {
+                id: counter + "p",
+                "class": 'movesNot'
+            }).appendTo('#black');
+            jQuery("#" + counter + "p").html(move.piece + move.to);
+
+            movesFen.push(game.fen())
+            counter++
+        }
+
+        function onDrop(source, target, piece, newPos, oldPos, orientation) {
+            // see if the move is legal
+            var move = game.move({
+                from: source,
+                to: target,
+                promotion: 'q' // NOTE: always promote to a queen for example simplicity
+            })
+
+            // illegal move
+            if (move === null) return 'snapback'
+
+
+
+            jQuery('<div/>', {
+                id: counter + "p",
+                "class": 'movesNot'
+            }).appendTo('#white');
+            jQuery("#" + counter + "p").html(move.piece + move.to);
+
+
+            jQuery('<div/>', {
+                id: counter + "m",
+                "class": 'movesNot'
+            }).appendTo('#moveNum');
+            jQuery("#" + counter + "m").html((counter + 1) / 2 + 0.5);
+
+            movesFen.push(game.fen());
+            counter++;
+
+            if (game.game_over()) {
+                var winner;
+                if (game.in_checkmate()) {
+                    if (game.turn() === 'b') {
+                        winner = "white"
+                    }
+                    else {
+                        winner = "black"
+                    }
+                }
+
+                // draw?
+                else if (game.in_draw()) {
+                    winner= "draw"
+                }
+            event.preventDefault();
+
+            var datajson = {
+                owner: 1,
+                playerWhite: "Player",
+                playerBlack: "Stockfish",
+                pgn: game.pgn(),
+                fens: movesFen.toString(),
+                winner: winner
+            }
+            $.ajax({
+                url: "/VsAi?handler=SaveGame",
+                type: "POST",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("XSRF-TOKEN",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(datajson),
+                success: function (response) {
+                   
+                }
+
+            });
+
+
+            }
+
+
+            // make random legal move for black
+            window.setTimeout(makeRandomMove, 2000)
+
+        }
+
+        // update the board position after the piece snap
+        // for castling, en passant, pawn promotion
+        function onSnapEnd() {
+            board.position(game.fen())
+
+        }
+
+        var config = {
+            draggable: true,
+            showNotation: true,
+            position: 'start',
+            onDragStart: onDragStart,
+            onDrop: onDrop,
+            onSnapEnd: onSnapEnd,
+            onChange: onChange
+        }
+        board = Chessboard('myBoard', config)
+
+
+
+
+    </script>
+
+}
+

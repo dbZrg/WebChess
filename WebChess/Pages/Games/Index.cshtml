@@ -1,0 +1,231 @@
+﻿@page
+@model WebChess.Pages.Games.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<div class="container">
+    <div class="row">
+        <div class="col-sm">
+            <form>
+                <p>
+                    Title: <input type="text" asp-for="SearchString" />
+                    <input type="submit" value="Filter" />
+                </p>
+            </form>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ChessGame[0].playerWhite)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ChessGame[0].playerBlack)
+                        </th>
+                        <th>
+
+                        </th>
+                        <th>
+
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ChessGame[0].winner)
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.ChessGame)
+                    {                 
+                        <tr>
+                            <td>
+                                @Html.HiddenFor(modelItem => item.owner)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.playerWhite)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.playerBlack)
+                            </td>
+                            <td>
+                                @Html.HiddenFor(modelItem => item.pgn)
+                            </td>
+                            <td>
+                                @Html.HiddenFor(modelItem => item.fens)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.winner)
+                            </td>
+                            <td>
+                                @*<a asp-page="./Edit" asp-route-id="@item.ID">Edit</a> |
+                                <a asp-page="./Details" asp-route-id="@item.ID">Details</a> |
+                                <a asp-page="./Delete" asp-route-id="@item.ID">Delete</a>*@
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="col-sm">
+            <div class="row align-items-center">
+                <div class="col-lg-7">
+                    <div class="row">
+                        <div id="blackName" class="col">
+                            <h2>Black</h2>
+                        </div>
+                        <div class="col">
+
+                        </div>
+                    </div>
+                    <div id="myBoard" style="width: 100%"></div>
+                    <div class="row">
+                        <div id="whiteName" class="col">
+                            <h2>White</h2>
+                        </div>
+                        <div class="col">
+
+                        </div>
+
+
+                    </div>
+                </div>
+
+
+
+                <div id="movesContainer" class="col-sm-1">
+                    <div class="row">
+                        <div id="moveNum" class="col-1">
+
+                        </div>
+                        <div id="white" class="col moveCont">
+
+                        </div>
+                        <div id="black" class="col moveCont">
+
+                        </div>
+                    </div>
+                    </div>
+
+
+
+                </div>
+            </div>
+        </div>
+
+</div>
+
+@section scripts {
+    <script src="~/js/chessboard-1.0.0.js"></script>
+    <script src="~/js/chess.js"></script>
+    <script>
+        $(document).ready(function () {
+            var fens;
+
+            $(document).on('keypress', function (e) {
+                switch (e.which) {
+                    case 8:
+                        console.log('backspace pressed');
+                        break;
+                    case 9:
+                        console.log('tab pressed');
+                        break;
+                    case 16:
+                        console.log('shift pressed');
+                        break;
+                }
+            });
+
+            $(".table").on('click', 'tr', function () {
+                // get the current row
+                var currentRow = $(this).closest("tr");
+
+                var pgn = currentRow.find("#item_pgn").val(); // get current row 1st table cell TD value
+                fens = currentRow.find("#item_fens").val(); // get current row 2nd table cell TD value
+                
+                var whiteN = currentRow.find("td:eq(1)").text(); // get current row 2nd TD
+                var blackN = currentRow.find("td:eq(2)").text(); // get current row 3rd TD
+                fens = fens.split(",")
+                pgn = pgn.split(" ")
+                var lastPos = fens[fens.length - 1]
+                board.position(lastPos)
+                
+                $("#whiteName h2").replaceWith("<h2>" + whiteN + "</h2>");
+                $("#blackName h2").replaceWith("<h2>" + blackN + "</h2>");
+
+                $("#white").empty();
+                $("#black").empty();
+                $("#moveNum").empty();
+
+                var moveNum = 0;
+                var moveid = 0;
+                for (i = 0; i <= pgn.length - 1; i++){
+                    if (moveNum == 0) {
+                        jQuery('<div/>', {
+                            id: i + "m",
+                            "class": 'movesNot'
+                        }).appendTo('#moveNum');
+                        jQuery("#" + i + "m").html(pgn[i]);
+                        moveNum++;
+                    }
+                    else if (moveNum == 1) {
+                        jQuery('<div/>', {
+                            id: moveid + "p",
+                            "class": 'movesNot'
+                        }).appendTo('#white');
+                        jQuery("#" + moveid + "p").html(pgn[i]);
+                        moveNum++;
+                        moveid++;
+                    }
+                    else if (moveNum == 2) {
+                        jQuery('<div/>', {
+                            id: moveid + "p",
+                            "class": 'movesNot'
+                        }).appendTo('#black');
+                        jQuery("#" + moveid + "p").html(pgn[i]);
+                        moveNum = 0;
+                        moveid++;
+                    }
+                    
+
+                }
+                
+
+            });
+
+            $("#movesContainer .moveCont").on("click", "div", function (event) {
+                var Id = jQuery(this).attr("id");
+                $('.movesNot').each(function () {
+                    let elem = $(this);
+                    elem.css('background-color', 'white');
+                });
+                $(this).css('background-color', 'grey');
+
+                Id = Id.slice(0, -1);
+                board.position(fens[Id]);
+
+
+            });
+
+        
+        });
+
+
+        var config = {
+           
+            showNotation: true,
+            position: 'start'
+            
+        }
+        board = Chessboard('myBoard', config)
+    </script>
+}

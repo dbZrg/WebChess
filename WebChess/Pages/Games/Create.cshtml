@@ -1,0 +1,59 @@
+﻿@page
+@model WebChess.Pages.Games.CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>ChessGame</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="ChessGame.owner" class="control-label"></label>
+                <input asp-for="ChessGame.owner" class="form-control" />
+                <span asp-validation-for="ChessGame.owner" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ChessGame.playerWhite" class="control-label"></label>
+                <input asp-for="ChessGame.playerWhite" class="form-control" />
+                <span asp-validation-for="ChessGame.playerWhite" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ChessGame.playerBlack" class="control-label"></label>
+                <input asp-for="ChessGame.playerBlack" class="form-control" />
+                <span asp-validation-for="ChessGame.playerBlack" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ChessGame.pgn" class="control-label"></label>
+                <input asp-for="ChessGame.pgn" class="form-control" />
+                <span asp-validation-for="ChessGame.pgn" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ChessGame.fens" class="control-label"></label>
+                <input asp-for="ChessGame.fens" class="form-control" />
+                <span asp-validation-for="ChessGame.fens" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ChessGame.winner" class="control-label"></label>
+                <input asp-for="ChessGame.winner" class="form-control" />
+                <span asp-validation-for="ChessGame.winner" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

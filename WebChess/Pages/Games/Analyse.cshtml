@@ -1,0 +1,328 @@
+﻿@page
+
+@model WebChess.Pages.Games.AnalyseModel
+@{
+    ViewData["Title"] = "Analyse";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+<div id="preloader">
+    <div id="status">&nbsp;</div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="engineChange" tabindex="-1" role="dialog" aria-labelledby="Engine config" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="slidecontainer">
+                    <input type="range" min="5" max="30" value="20" class="slider" id="depthControl">
+                    Engine search depth:<span class="range-value">20</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="saveButton" type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h1>Analyse</h1>
+<div id="content" class="container">
+    <div class="row">
+        <div class="col-sm-8">
+            <div class="row">
+                <div id="blackName" class="col">
+                    <h2>@Html.DisplayFor(model => model.ChessGame.playerBlack)</h2>
+                </div>
+                <div class="col">
+
+                </div>
+            </div>
+            <div id="myBoard" style="width: 100%"></div>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <div class="row">
+                <div id="whiteName" class="col">
+                    <h2>@Html.DisplayFor(model => model.ChessGame.playerWhite)</h2>
+                </div>
+                <div class="col">
+
+                </div>
+
+
+            </div>
+        </div>
+
+
+
+        <div class="col-sm-4">
+            <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#engineChange">
+               Engine config
+            </button>
+
+            <div class="row">
+
+
+                <div class="col-12 order-sm-1 order-2">
+                    <div id="movesContainer" class="row">
+                        <div id="moveNum" class="col-1">
+
+                        </div>
+                        <div id="white" class="col moveCont">
+
+                        </div>
+                        <div id="black" class="col moveCont">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12 order-1">
+                    <div class="btn-group controls" role="group" aria-label="Controls">
+                        <button id="backEnd" type="button" class="btn btn-secondary">&#x21E4;</button>
+                        <button id="backOne" type="button" class="btn btn-secondary">&#x2190;</button>
+                        <button id="forOne" type="button" class="btn btn-secondary">&#x2192;</button>
+                        <button id="forEnd" type="button" class="btn btn-secondary">&#x21E5;</button>
+                    </div>
+                </div>
+            </div>
+
+                <div id="depth" class="row">
+                    <div class="spinner-border spinner-border-sm">
+                        <span class="sr-only">Calculating...</span>
+                    </div>
+                </div>
+                <div id="searchInfo" class="row"><p></p></div>
+                <div id="bestMove" class="row"></div>
+
+                <div id="eval" class="row"></div>
+
+            </div>
+        </div>
+
+</div>
+
+
+
+<div>
+
+
+
+    @Html.HiddenFor(model => model.ChessGame.pgn)
+
+
+
+    @Html.HiddenFor(model => model.ChessGame.fens)
+
+
+
+    @Html.HiddenFor(model => model.ChessGame.winner)
+
+
+</div>
+@section scripts {
+    <script src="~/js/chessboard-1.0.0.js"></script>
+    <script src="~/js/chess.js"></script>
+    <script src="~/js/stockfish.js"></script>
+
+
+    <script>
+        var game = new Chess()
+        var currentPos;
+        var currentDepth = 20;
+        $(document).ready(function () {
+            var wasmSupported = typeof WebAssembly === 'object' && WebAssembly.validate(Uint8Array.of(0x0, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00));
+
+            var stockfish = new Worker(wasmSupported ? 'stockfish.wasm.js' : 'stockfish.js');
+            var $board = $('#myBoard')
+            var fens = $('#ChessGame_fens').val();
+            var pgn = $('#ChessGame_pgn').val();
+            fens = fens.split(",")
+            pgn = pgn.split(" ")
+            var depth;
+            var evaluation;
+            var bestVar;
+            stockfish.addEventListener('message', function (e) {
+                console.log(e.data);
+
+                var lineList = e.data.split(" ")
+
+                if (lineList[0] == "info") {
+                    depth = lineList[2]
+                    evaluation = lineList[9]
+
+                    var floatEval = parseFloat(evaluation);
+                    floatEval = floatEval / 100;
+                    Number(floatEval).toFixed(2);
+
+
+                    var pvID = lineList.indexOf("pv")
+                    bestVar = lineList.slice(pvID + 1)
+                   
+                    if (board.orientation() == "white" && game.turn() == "b") {
+                        floatEval = -floatEval;
+                    }
+                    else if (board.orientation() == "black" && game.turn() == "w") {
+                        floatEval = -floatEval;
+                    }
+                    $('.progress-bar').css("width", (floatEval + 50) + "%").text(floatEval)
+                    $('#searchInfo p').text(bestVar)
+                    $('#depth').text(depth)
+                    $('#eval').text(floatEval)
+
+                    bestVar = bestVar.toString()
+                    bestVar = bestVar.split(",")
+                    var bestMove = bestVar[0]
+                    var from = bestMove.slice(0, 2)
+                    var to = bestMove.slice(2, 4)
+                    removeHighlights('white')
+                    $board.find('.square-' + from).addClass('highlight-white')
+                    $board.find('.square-' + to).addClass('highlight-white')
+                }
+                else if (lineList[0] == "bestmove") {
+
+                    $('#bestMove').text(lineList[1])
+                    
+                }
+
+            });
+
+            stockfish.postMessage('uci');
+
+
+            var currentPos = fens[0]
+            game.load(currentPos)
+
+            var currentMove = 0
+
+            stockfish.postMessage("ucinewgame");
+
+            // set new game position
+            stockfish.postMessage("position fen " + currentPos);
+            // start search
+            stockfish.postMessage("go depth 20");
+
+
+
+
+            var moveNum = 0;
+            var moveid = 0;
+            for (i = 0; i <= pgn.length - 1; i++) {
+                if (moveNum == 0) {
+                    jQuery('<div/>', {
+                        id: i + "m",
+                        "class": 'movesNot'
+                    }).appendTo('#moveNum');
+                    jQuery("#" + i + "m").html(pgn[i]);
+                    moveNum++;
+                }
+                else if (moveNum == 1) {
+                    jQuery('<div/>', {
+                        id: moveid + "p",
+                        "class": 'movesNot'
+                    }).appendTo('#white');
+                    jQuery("#" + moveid + "p").html(pgn[i]);
+                    moveNum++;
+                    moveid++;
+                }
+                else if (moveNum == 2) {
+                    jQuery('<div/>', {
+                        id: moveid + "p",
+                        "class": 'movesNot'
+                    }).appendTo('#black');
+                    jQuery("#" + moveid + "p").html(pgn[i]);
+                    moveNum = 0;
+                    moveid++;
+                }
+            }
+
+            $("#0p").css('background-color', 'grey');
+            $('.slider').on('input', function () {
+                $('.range-value').html(this.value);
+            });
+
+            $("#saveButton").click(function () {
+                $("#engineChange").modal('hide')
+                currentDepth = $('#depthControl').val()
+                stockfish.postMessage("go depth " + currentDepth);
+            });
+
+            $("#movesContainer .moveCont").on("click", "div", function (event) {
+                var Id = jQuery(this).attr("id");
+                currentMove = Id.slice(0, -1);
+                currentPos = fens[currentMove]
+                game.load(currentPos)
+                board.position(currentPos)
+
+
+            });
+
+            $("#backOne").click(function () {
+                if (currentMove > 0) {
+                    currentMove--;
+                    currentPos = fens[currentMove]
+                    game.load(currentPos)
+                    board.position(currentPos);
+
+                }
+            });
+            $("#backEnd").click(function () {
+                currentMove = 0;
+                currentPos = fens[currentMove]
+                game.load(currentPos)
+                board.position(currentPos);
+
+            });
+            $("#forOne").click(function () {
+                if (currentMove < fens.length) {
+                    currentMove++;
+                    currentPos = fens[currentMove]
+                    game.load(currentPos)
+                    board.position(currentPos);
+
+                }
+            });
+            $("#forEnd").click(function () {
+                currentMove = fens.length - 1;
+                currentPos = fens[currentMove]
+                game.load(currentPos)
+                board.position(currentPos);
+
+            });
+            function removeHighlights(color) {
+                $board.find('.square-55d63')
+                    .removeClass('highlight-' + color)
+            }
+            function onChange(oldPos, newPos) {
+
+                stockfish.postMessage("position fen " + currentPos);
+                stockfish.postMessage("go depth " + currentDepth);
+                $('.movesNot').each(function () {
+                    this.style.background = "white";
+                });
+                $("#" + currentMove + "p").css('background-color', 'grey');
+            }
+
+            var config = {
+                showNotation: true,
+                position: currentPos,
+                onChange: onChange
+            }
+            board = Chessboard('myBoard', config)
+
+
+        });
+        $(window).on('load', function () { 
+            $('#status').fadeOut(); 
+            $('#preloader').delay(350).fadeOut('slow');
+            $('#content').delay(350).css({ 'overflow': 'visible' });
+        })
+
+    </script>
+}

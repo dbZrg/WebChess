@@ -5,92 +5,91 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
 
-<p>
-    <a asp-page="Create">Create New</a>
-</p>
-<div class="container">
+<div class="container-fluid">
     <div class="row">
-        <div class="col-sm">
+        <div class="col-sm-9">
             <form>
                 <p>
-                    Title: <input type="text" asp-for="SearchString" />
+                    Search by player name: <input type="text" asp-for="SearchString" />
                     <input type="submit" value="Filter" />
                 </p>
             </form>
-
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>
-
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.ChessGame[0].playerWhite)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.ChessGame[0].playerBlack)
-                        </th>
-                        <th>
-
-                        </th>
-                        <th>
-
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.ChessGame[0].winner)
-                        </th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.ChessGame)
-                    {                 
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="thead-dark">
                         <tr>
-                            <td>
-                                @Html.HiddenFor(modelItem => item.owner)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.playerWhite)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.playerBlack)
-                            </td>
-                            <td>
-                                @Html.HiddenFor(modelItem => item.pgn)
-                            </td>
-                            <td>
-                                @Html.HiddenFor(modelItem => item.fens)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.winner)
-                            </td>
-                            <td>
-                                @*<a asp-page="./Edit" asp-route-id="@item.ID">Edit</a> |
-                                <a asp-page="./Details" asp-route-id="@item.ID">Details</a> |
-                                <a asp-page="./Delete" asp-route-id="@item.ID">Delete</a>*@
-                            </td>
+                            <th>
+                                @Html.DisplayNameFor(model => model.ChessGame[0].gameType)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.ChessGame[0].playerWhite)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.ChessGame[0].playerBlack)
+                            </th>
+                            <th>
+
+                            </th>
+                            <th>
+
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.ChessGame[0].winner)
+                            </th>
+                            <th>Analyse</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-        <div class="col-sm">
-            <div class="row align-items-center">
-                <div class="col-lg-7">
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.ChessGame)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.gameType)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.playerWhite)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.playerBlack)
+                                </td>
+                                <td>
+                                    @Html.HiddenFor(modelItem => item.pgn)
+                                </td>
+                                <td>
+                                    @Html.HiddenFor(modelItem => item.fens)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.winner)
+                                </td>
+                                <td>
+                                    <a asp-page="./Analyse" asp-route-id="@item.ID"><i class="fas fa-cogs p-2"></i></a>
+
+                                    @*<a asp-page="./Edit" asp-route-id="@item.ID">Edit</a> |
+                            <a asp-page="./Details" asp-route-id="@item.ID">Details</a> |
+                            <a asp-page="./Delete" asp-route-id="@item.ID">Delete</a>*@
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="row align-items-center sticky">
+
                     <div class="row">
                         <div id="blackName" class="col">
-                            <h2>Black</h2>
+                            <h4>Black</h4>
                         </div>
                         <div class="col">
 
                         </div>
                     </div>
-                    <div id="myBoard" style="width: 100%"></div>
+                    <div id="myBoard" class="board-fixed"></div>
                     <div class="row">
                         <div id="whiteName" class="col">
-                            <h2>White</h2>
+                            <h4>White</h4>
                         </div>
                         <div class="col">
 
@@ -98,25 +97,6 @@
 
 
                     </div>
-                </div>
-
-
-
-                <div id="movesContainer" class="col-sm-1">
-                    <div class="row">
-                        <div id="moveNum" class="col-1">
-
-                        </div>
-                        <div id="white" class="col moveCont">
-
-                        </div>
-                        <div id="black" class="col moveCont">
-
-                        </div>
-                    </div>
-                    </div>
-
-
 
                 </div>
             </div>
@@ -130,20 +110,6 @@
     <script>
         $(document).ready(function () {
             var fens;
-
-            $(document).on('keypress', function (e) {
-                switch (e.which) {
-                    case 8:
-                        console.log('backspace pressed');
-                        break;
-                    case 9:
-                        console.log('tab pressed');
-                        break;
-                    case 16:
-                        console.log('shift pressed');
-                        break;
-                }
-            });
 
             $(".table").on('click', 'tr', function () {
                 // get the current row
@@ -159,62 +125,62 @@
                 var lastPos = fens[fens.length - 1]
                 board.position(lastPos)
                 
-                $("#whiteName h2").replaceWith("<h2>" + whiteN + "</h2>");
-                $("#blackName h2").replaceWith("<h2>" + blackN + "</h2>");
+                $("#whiteName h4").replaceWith("<h4>" + whiteN + "</h4>");
+                $("#blackName h4").replaceWith("<h4>" + blackN + "</h4>");
 
-                $("#white").empty();
-                $("#black").empty();
-                $("#moveNum").empty();
+                //$("#white").empty();
+                //$("#black").empty();
+                //$("#moveNum").empty();
 
-                var moveNum = 0;
-                var moveid = 0;
-                for (i = 0; i <= pgn.length - 1; i++){
-                    if (moveNum == 0) {
-                        jQuery('<div/>', {
-                            id: i + "m",
-                            "class": 'movesNot'
-                        }).appendTo('#moveNum');
-                        jQuery("#" + i + "m").html(pgn[i]);
-                        moveNum++;
-                    }
-                    else if (moveNum == 1) {
-                        jQuery('<div/>', {
-                            id: moveid + "p",
-                            "class": 'movesNot'
-                        }).appendTo('#white');
-                        jQuery("#" + moveid + "p").html(pgn[i]);
-                        moveNum++;
-                        moveid++;
-                    }
-                    else if (moveNum == 2) {
-                        jQuery('<div/>', {
-                            id: moveid + "p",
-                            "class": 'movesNot'
-                        }).appendTo('#black');
-                        jQuery("#" + moveid + "p").html(pgn[i]);
-                        moveNum = 0;
-                        moveid++;
-                    }
+                //var moveNum = 0;
+                //var moveid = 0;
+                //for (i = 0; i <= pgn.length - 1; i++){
+                //    if (moveNum == 0) {
+                //        jQuery('<div/>', {
+                //            id: i + "m",
+                //            "class": 'movesNot'
+                //        }).appendTo('#moveNum');
+                //        jQuery("#" + i + "m").html(pgn[i]);
+                //        moveNum++;
+                //    }
+                //    else if (moveNum == 1) {
+                //        jQuery('<div/>', {
+                //            id: moveid + "p",
+                //            "class": 'movesNot'
+                //        }).appendTo('#white');
+                //        jQuery("#" + moveid + "p").html(pgn[i]);
+                //        moveNum++;
+                //        moveid++;
+                //    }
+                //    else if (moveNum == 2) {
+                //        jQuery('<div/>', {
+                //            id: moveid + "p",
+                //            "class": 'movesNot'
+                //        }).appendTo('#black');
+                //        jQuery("#" + moveid + "p").html(pgn[i]);
+                //        moveNum = 0;
+                //        moveid++;
+                //    }}
                     
 
-                }
+                
                 
 
             });
 
-            $("#movesContainer .moveCont").on("click", "div", function (event) {
-                var Id = jQuery(this).attr("id");
-                $('.movesNot').each(function () {
-                    let elem = $(this);
-                    elem.css('background-color', 'white');
-                });
-                $(this).css('background-color', 'grey');
+        //    $("#movesContainer .moveCont").on("click", "div", function (event) {
+        //        var Id = jQuery(this).attr("id");
+        //        $('.movesNot').each(function () {
+        //            let elem = $(this);
+        //            elem.css('background-color', 'white');
+        //        });
+        //        $(this).css('background-color', 'grey');
 
-                Id = Id.slice(0, -1);
-                board.position(fens[Id]);
+        //        Id = Id.slice(0, -1);
+        //        board.position(fens[Id]);
 
 
-            });
+        //    });
 
         
         });
@@ -222,7 +188,7 @@
 
         var config = {
            
-            showNotation: true,
+            showNotation: false,
             position: 'start'
             
         }

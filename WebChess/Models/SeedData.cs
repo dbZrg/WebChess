@@ -23,21 +23,13 @@ namespace WebChess.Models
                 }
 
                 context.ChessGame.AddRange(
-                    new ChessGame
-                    {
-                        owner = 2,
-                        playerWhite = "dsad",
-                        playerBlack = "Romantic Comedy",
-                        pgn = "dfasfa",
-                        fens = "dfasfa,sasa",
-                        winner = "dasda"
-                    },
 
                     new ChessGame
                     {
-                        owner = 3,
-                        playerWhite = "dsadsa",
-                        playerBlack = "Romantic Comedy",
+                        
+                        playerWhite = "Test",
+                        playerBlack = "Test2",
+                        gameType = "blitz",
                         pgn = "dfasffffffa",
                         fens = "dfasfa,sasa",
                         winner = "das43444da"

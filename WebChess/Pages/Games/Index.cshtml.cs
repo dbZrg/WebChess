@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using WebChess.Data;
 using WebChess.Models;
 
+
+
 namespace WebChess.Pages.Games
 {
     public class IndexModel : PageModel
@@ -21,6 +23,7 @@ namespace WebChess.Pages.Games
         }
 
         public IList<ChessGame> ChessGame { get;set; }
+
         [BindProperty(SupportsGet = true)]
         public string SearchString { get; set; }
   

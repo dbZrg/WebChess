@@ -28,19 +28,23 @@ namespace WebChess.Migrations
                     b.Property<string>("fens")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("owner")
-                        .HasColumnType("int");
+                    b.Property<string>("gameType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("pgn")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("playerBlack")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("playerWhite")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("winner")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ID");

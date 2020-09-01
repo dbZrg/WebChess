@@ -3,199 +3,385 @@
 @{
     ViewData["Title"] = "VsAi";
 }
-
+@using Microsoft.AspNetCore.Identity
+@using WebChess.Areas.Identity.Data
+@inject SignInManager<WebChessUser> SignInManager
+@inject UserManager<WebChessUser> UserManager
 
 @Html.AntiForgeryToken()
-<div class="row">
-    <div class="col-sm-8">
-        <div class="row">
-            <div class="col flex">
-                <h2>Stockfish</h2><div id="oppIcon" class="circle"></div>
-            </div>
-            <div class="col">
-                <h3 class="player2clock">5:01</h3>
-            </div>
-        </div>
-        <div id="myBoard" style="width: 100%"></div>
-        <div class="row">
-            <div class="col flex">
-                <h2>Player</h2><div id="playerIcon" class="circle"></div>
-            </div>
-            <div class="col">
-                <h3 class="player1clock">5:01</h3>
-            </div>
 
-
-        </div>
-    </div>
-    <div class="col-sm-4">
-        <div class="row">
-            <div class="col-sm">
-                <button id="back" type="button" class="btn btn-primary btn-lg btn-block">Takeback</button>
-            </div>
-            <div class="col-sm">
-                <button id="newGame" type="button" class="btn btn-primary btn-lg btn-block">New Game</button>
-            </div>
-
-        </div>
-
-        <div id="movesContainer" class="row">
-            <div id="moveNum" class="col-1">
-
-            </div>
-            <div id="white" class="col moveCont">
-
-            </div>
-            <div id="black" class="col moveCont">
-
-            </div>
-
-        </div>
-
-
-    </div>
+<!-- Modal -->
+<div id="preloader">
+    <div id="status">&nbsp;</div>
 </div>
 
+
+<div class="modal fade" id="newGameModal" tabindex="-1" role="dialog" aria-labelledby="Engine config" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <h5>Time: <span class="range-value">5</span> min</h5>
+                <div class="slidecontainer">
+                    <input type="range" min="5" max="60" value="5" class="slider" id="timeControl">
+
+                </div>
+
+
+                <h5>Color:</h5>
+
+                <div class="custom-radios">
+                    <div>
+                        <input type="radio" id="color-1" name="color" value="w" checked>
+                        <label for="color-1">
+                            <span>
+                            </span>
+                        </label>
+                    </div>
+
+                    <div>
+                        <input type="radio" id="color-2" name="color" value="b">
+                        <label for="color-2">
+                            <span>
+                            </span>
+                        </label>
+                    </div>
+
+
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="newGameMod" type="button" class="btn btn-secondary">New Game</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container" id="content">
+    <div class="row  align-items-center">
+        <div class="col-sm-8">
+            <div class="row">
+                <div class="col flex">
+                    <div id="oppIcon" class="circle"></div>
+                    <div id="aiName" class="blackName"><h2>Stockfish</h2></div>
+                </div>
+                <div class="col text-right">
+                    <h3 class="player2clock blackTime">5:01</h3>
+                </div>
+            </div>
+            <div id="myBoard" style="width: 100%"></div>
+            <div class="row">
+                <div class="col flex">
+                    <div id="playerIcon" class="circle"></div>
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+
+                        <a id="playerName" class="whiteName" asp-page="./Profile" asp-route-name="@User.Identity.Name"><h2>@User.Identity.Name</h2></a>
+                    }
+                    else
+                    {
+                        <h2>Player</h2>
+                    }
+
+                </div>
+                <div class="col text-right">
+                    <h3 class="player1clock whiteTime">5:01</h3>
+                </div>
+
+
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="row">
+                <div class="col-sm-12 nopadding">
+                    <div id="msgContainer" class="row justify-content-md-center invisible p-2 m-2">
+                        <span id="winnerMsg" class="badge badge-secondary"></span>
+                    </div>
+                    <div class="btn-group controls" role="group" aria-label="Controls">
+                        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#newGameModal">
+                            <i class="fa fa-plus mr-2" aria-hidden="true"></i>New game
+                        </button>
+                        <button id="resign" type="button" class="btn btn-secondary">
+                            <i class="fa fa-times mr-2" aria-hidden="true"></i>Resign
+                        </button>
+                        <button id="back" type="button" class="btn btn-secondary">
+                            <i class="fa fa-undo mr-2" aria-hidden="true"></i>Take Back
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 order-sm-1 order-2">
+                    <div id="movesContainer" class="row">
+                        <div id="moveNum" class="col-1">
+
+                        </div>
+                        <div id="white" class="col moveCont">
+
+                        </div>
+                        <div id="black" class="col moveCont">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12 order-1 nopadding">
+                    <div class="btn-group controls" role="group" aria-label="Controls">
+                        <button id="backEnd" type="button" class="btn btn-secondary">&#x21E4;</button>
+                        <button id="backOne" type="button" class="btn btn-secondary">&#x2190;</button>
+                        <button id="forOne" type="button" class="btn btn-secondary">&#x2192;</button>
+                        <button id="forEnd" type="button" class="btn btn-secondary">&#x21E5;</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section scripts {
     <script src="~/js/chessboard-1.0.0.js"></script>
     <script src="~/js/chess.js"></script>
+    <script src="~/js/stockfish.js"></script>
     <script>
+        $(document).ready(function () {
+        //TODO add stockfish opp
+        //var wasmSupported = typeof WebAssembly === 'object' && WebAssembly.validate(Uint8Array.of(0x0, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00));
+        //var stockfish = new Worker(wasmSupported ? 'stockfish.wasm.js' : 'stockfish.js');
+        var userAuthorized = @User.Identity.IsAuthenticated.ToString().ToLower();
+        var board = null;
+        var game = new Chess();
 
-        var WhiteToMove = true;
-        var counter = 0;
         var movesFen = [];
-        var board = null
-        var game = new Chess()
+        var counter = 0;
+        var playerColor = "w";
+        var timer1 = "5:01";
+        var timer2 = "5:01";
+        var resign = false;
+        var gamerOver = false;
+        $("#playerIcon").css('background-color', 'green');
 
+        //view position clicking on move notation
         $("#movesContainer .moveCont").on("click", "div", function (event) {
             var Id = jQuery(this).attr("id");
-            $('.movesNot').each(function () {
-                let elem = $(this);
-                elem.css('background-color', 'white');
-            });
-            $(this).css('background-color', 'grey');
-
             Id = Id.slice(0, -1);
             board.position(movesFen[Id]);
-
-
+            $(this).css('background-color', 'white');
         });
 
+        $('.slider').on('input', function () {
+            $('.range-value').html(this.value);
+        });
+
+        //take back move
         $("#back").click(function () {
-            if (counter > 0) {
+            //check if any moves are played
+            if (counter > 1) {
                 var playerToMove = game.turn();
                 game.undo();
-                board.position(game.fen())
+                game.undo();
+                board.position(game.fen());
                 movesFen.pop();
-                counter--;
+                movesFen.pop();
+                counter = counter - 2;
 
-                if (playerToMove == "w") {
-                    $('#black div').last().remove();
-                    $('#white div').last().css('background-color', 'grey');
+                //remove move notation
+                $('#black div').last().remove();
+                $('#white div').last().remove();
+                $('#moveNum div').last().remove();
+
+                //highlight last move played after take back
+                if (playerToMove == "w" && playerColor == "w") {
+                    $('#black div').last().css('background-color', '#d6d6d6');
                 }
-                else {
-                    $('#white div').last().remove();
-                    $('#moveNum div').last().remove();
-                    $('#black div').last().css('background-color', 'grey');
+                else if (playerToMove == "b" && playerColor == "b") {
+                    $('#white div').last().css('background-color', '#d6d6d6');
                 }
             }
         });
 
-        $("#newGame").click(function () {
+        //new game
+        $("#newGameMod").click(function () {
+            //reset all
             board = Chessboard('myBoard', config)
-            game = new Chess()
-            movesFen = []
+            game = new Chess();
+            movesFen = [];
             counter = 0;
+            gameOver = false;
+            resign = false;
             $("#white").empty();
             $("#black").empty();
             $("#moveNum").empty();
-            timer1 = "5:01";
-            timer2 = "5:01";
-            $("#oppIcon").css('background-color', 'grey');
-            $("#playerIcon").css('background-color', 'green');
+            //set new time control
+            var timeControl = $('#timeControl').val();
+            timer1 = timeControl + ":01";
+            timer2 = timeControl + ":01";
             $('.player1clock').html(timer1);
             $('.player2clock').html(timer2);
+            //set new player color
+            var newColor = $("input[name='color']:checked").val();
+            //remove winner msg
+            $("#msgContainer").addClass("invisible");
+
+            //flip board 
+            if (newColor == "w") {
+                board.orientation("white");
+                playerColor = "w";
+                $("#playerName").removeClass("blackName");
+                $("#playerName").addClass("whiteName");
+                $("#aiName").removeClass("whiteName");
+                $("#aiName").addClass("blackName");
+            } else {
+                board.orientation("black");
+                playerColor = "b";
+                $("#playerName").removeClass("whiteName");
+                $("#playerName").addClass("blackName");
+                $("#aiName").removeClass("blackName");
+                $("#aiName").addClass("whiteName");
+            }
+
+            //hide modal
+            $('#newGameModal').modal('hide');
+            //start clock
+            interval = setInterval(timers, 1000);
+            //make move for white if player is black
+            if (board.orientation() == "black") {
+                makeRandomMove();
+            }
+            $("#resign").removeAttr('disabled');
+            $("#oppIcon").css('background-color', 'grey');
+            $("#playerIcon").css('background-color', 'green');
+
         });
 
-        var timer1 = "5:01";
-        var timer2 = "5:01";
-        var interval = setInterval(function () {
-            var playerToMove = game.turn();
-            if (playerToMove == "w") {
+        $("#resign").click(function () {
+            resign = true;
+            var winner = getWinner();
+            AddToDatabase(winner);
+            clearInterval(interval);
+            $("#back").attr('disabled', 'disabled');
+            $("#resign").attr('disabled', 'disabled');
+        });
 
-                var timer = timer1.split(':');
-                //by parsing integer, I avoid all extra string processing
-                var minutes = parseInt(timer[0], 10);
-                var seconds = parseInt(timer[1], 10);
-                --seconds;
-                minutes = (seconds < 0) ? --minutes : minutes;
-                if (minutes < 0) clearInterval(interval);
-                seconds = (seconds < 0) ? 59 : seconds;
-                seconds = (seconds < 10) ? '0' + seconds : seconds;
-                //minutes = (minutes < 10) ?  minutes : minutes;
-                $('.player1clock').html(minutes + ':' + seconds);
-                timer1 = minutes + ':' + seconds;
+        var interval = setInterval(timers, 1000);
+        function timers() {
+                
+                //check if player or stockfish is out of time
+                if (timer1 == "0:00" || timer2 == "0:00") {
+                    gamerOver = true;
+                    var winner = getWinner();
+                    AddToDatabase(winner);
+                    clearInterval(interval);
+                }
+                var playerToMove = game.turn();
+
+                if (playerToMove == playerColor) {
+                    timer1 = timer(timer1);
+                    $(".player1clock").html(timer1);
+                }
+                else {
+                    timer2 = timer(timer2);
+                    $(".player2clock").html(timer2);
+                }
+                
+
+            }
+
+        function timer(timerT) {
+            var timer = timerT.split(':');
+            var minutes = parseInt(timer[0], 10);
+            var seconds = parseInt(timer[1], 10);
+            --seconds;
+            minutes = (seconds < 0) ? --minutes : minutes;
+            if (minutes <= 0) clearInterval(interval);
+            seconds = (seconds < 0) ? 59 : seconds;
+            seconds = (seconds < 10) ? '0' + seconds : seconds;
+            newTime = minutes + ':' + seconds;
+            return newTime;
+        }
+
+        //board events
+        function onChange(oldPos, newPos) {
+            $('.movesNot').each(function () {
+                let elem = $(this);
+                elem.css('background-color', '#f9f9f9');
+            });
+
+            var playerToMove = game.turn();
+            if (playerToMove == playerColor) {
+                $("#back").removeAttr('disabled');
+                $("#oppIcon").css('background-color', 'grey');
+                $("#playerIcon").css('background-color', 'green');
             }
             else {
-                var timer = timer2.split(':');
-                //by parsing integer, I avoid all extra string processing
-                var minutes = parseInt(timer[0], 10);
-                var seconds = parseInt(timer[1], 10);
-                --seconds;
-                minutes = (seconds < 0) ? --minutes : minutes;
-                if (minutes < 0) clearInterval(interval);
-                seconds = (seconds < 0) ? 59 : seconds;
-                seconds = (seconds < 10) ? '0' + seconds : seconds;
-                //minutes = (minutes < 10) ?  minutes : minutes;
-                $('.player2clock').html(minutes + ':' + seconds);
-                timer2 = minutes + ':' + seconds;
-
-            }
-
-        }, 1000);
-
-        function onChange(oldPos, newPos) {
-
-            //if current board position is last )
-            if (game.turn() == "b") {
+                $("#back").attr('disabled', 'disabled');
                 $("#oppIcon").css('background-color', 'green');
                 $("#playerIcon").css('background-color', 'grey');
             }
-            else {
-                $("#oppIcon").css('background-color', 'grey');
-                $("#playerIcon").css('background-color', 'green');
 
+            if (playerToMove == "b") {
+                $('#white div').last().css('background-color', '#d6d6d6');
+               
+            }
+            else {
+                $('#black div').last().css('background-color', '#d6d6d6');
+              
             }
 
+            if (game.game_over()) {
+                var winner = getWinner();
+                AddToDatabase(winner);
+                clearInterval(interval);
+            }
 
         }
 
         function onDragStart(source, piece, position, orientation) {
-            // do not pick up pieces if the game is over
-            if (game.game_over()) return false
+            //do not pick up pieces if the game is over
+            if (game.game_over() || gamerOver == true || resign == true) return false
 
-            // only pick up pieces for White
-            if (piece.search(/^b/) !== -1) return false
+            //
+            if (playerColor == "w") {
+                if (piece.search(/^b/) !== -1)
+                    return false
+            } else if (playerColor == "b") {
+                if (piece.search(/^w/) !== -1)
+                    return false
+            }
         }
 
         function makeRandomMove() {
-            var possibleMoves = game.moves()
+            var possibleMoves = game.moves();
 
-            // game over
-            if (possibleMoves.length === 0) return
+            //game over
+            if (possibleMoves.length === 0) return;
 
-            var randomIdx = Math.floor(Math.random() * possibleMoves.length)
-            var move = game.move(possibleMoves[randomIdx])
-            board.position(game.fen())
-            
-            jQuery('<div/>', {
-                id: counter + "p",
-                "class": 'movesNot'
-            }).appendTo('#black');
-            jQuery("#" + counter + "p").html(move.piece + move.to);
+            var randomIdx = Math.floor(Math.random() * possibleMoves.length);
+            var move = game.move(possibleMoves[randomIdx]);
 
-            movesFen.push(game.fen())
+            if (board.orientation() == "black") {
+                jQuery('<div/>', {
+                    id: counter + "p",
+                    "class": 'movesNot'
+                }).appendTo('#white');
+                jQuery("#" + counter + "p").html(move.piece + move.to);
+
+                jQuery('<div/>', {
+                    id: counter + "m",
+                    "class": 'movesNot'
+                }).appendTo('#moveNum');
+                jQuery("#" + counter + "m").html((counter + 1) / 2 + 0.5)+".";
+
+            } else {
+                jQuery('<div/>', {
+                    id: counter + "p",
+                    "class": 'movesNot'
+                }).appendTo('#black');
+                jQuery("#" + counter + "p").html(move.piece + move.to);
+            }
+
+            board.position(game.fen());
+            movesFen.push(game.fen());
             counter++
         }
 
@@ -211,78 +397,37 @@
             if (move === null) return 'snapback'
 
 
+            if (board.orientation() == "white") {
+                jQuery('<div/>', {
+                    id: counter + "p",
+                    "class": 'movesNot'
+                }).appendTo('#white');
+                jQuery("#" + counter + "p").html(move.san);
 
-            jQuery('<div/>', {
-                id: counter + "p",
-                "class": 'movesNot'
-            }).appendTo('#white');
-            jQuery("#" + counter + "p").html(move.piece + move.to);
 
+                jQuery('<div/>', {
+                    id: counter + "m",
+                    "class": 'movesNot'
+                }).appendTo('#moveNum');
+                jQuery("#" + counter + "m").html((counter + 1) / 2 + 0.5+".");
+            } else {
+                jQuery('<div/>', {
+                    id: counter + "p",
+                    "class": 'movesNot'
+                }).appendTo('#black');
+                jQuery("#" + counter + "p").html(move.san);
 
-            jQuery('<div/>', {
-                id: counter + "m",
-                "class": 'movesNot'
-            }).appendTo('#moveNum');
-            jQuery("#" + counter + "m").html((counter + 1) / 2 + 0.5);
-
+            }
             movesFen.push(game.fen());
             counter++;
 
-            if (game.game_over()) {
-                var winner;
-                if (game.in_checkmate()) {
-                    if (game.turn() === 'b') {
-                        winner = "white"
-                    }
-                    else {
-                        winner = "black"
-                    }
-                }
-
-                // draw?
-                else if (game.in_draw()) {
-                    winner= "draw"
-                }
-            event.preventDefault();
-
-            var datajson = {
-                owner: 1,
-                playerWhite: "Player",
-                playerBlack: "Stockfish",
-                pgn: game.pgn(),
-                fens: movesFen.toString(),
-                winner: winner
-            }
-            $.ajax({
-                url: "/VsAi?handler=SaveGame",
-                type: "POST",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("XSRF-TOKEN",
-                        $('input:hidden[name="__RequestVerificationToken"]').val());
-                },
-                dataType: "json",
-                contentType: "application/json; charset=utf-8",
-                data: JSON.stringify(datajson),
-                success: function (response) {
-                   
-                }
-
-            });
-
-
-            }
-
-
             // make random legal move for black
-            window.setTimeout(makeRandomMove, 2000)
-
+            window.setTimeout(makeRandomMove, 2000);
         }
 
         // update the board position after the piece snap
-        // for castling, en passant, pawn promotion
         function onSnapEnd() {
             board.position(game.fen())
-
         }
 
         var config = {
@@ -294,11 +439,94 @@
             onSnapEnd: onSnapEnd,
             onChange: onChange
         }
-        board = Chessboard('myBoard', config)
+        board = Chessboard('myBoard', config);
+        $(window).resize(board.resize);
+
+        function getWinner() {
+            var winner;
+            if (resign == true) {
+                if (playerColor == "w") {
+                    winner = "black"
+                } else {
+                    winner = "white"
+                }
+            }
+            else if (timer1 == "0:00") {
+                if (playerColor == "w") {
+                    winner = "black"
+                } else {
+                    winner = "white"
+                }
+            }
+            else if (timer2 == "0:00") {
+                if (playerColor == "w") {
+                    winner = "white"
+                } else {
+                    winner = "black"
+                }
+            }
+            else if (game.in_checkmate()) {
+                if (game.turn() === 'b') {
+                    winner = "white"
+                }
+                else {
+                    winner = "black"
+                }
+            }
+            else if (game.in_draw()) {
+                winner = "draw"
+            }
+
+            if (winner.charAt(0) == playerColor) {
+                $("#winnerMsg").text("You won!")
+            } else if (winner == "draw") {
+                $("#winnerMsg").text("Draw!")
+            } else {
+                $("#winnerMsg").text("You lost!")
+            }
+            $("#msgContainer").removeClass("invisible");
+
+            return winner
 
 
+        }
+
+        function AddToDatabase(winner) {
+            if (userAuthorized == true) {
+                var datajson = {
+                    playerWhite: $(".whiteName h2").text(),
+                    playerBlack: $(".blackName h2").text(),
+                    pgn: game.pgn(),
+                    fens: movesFen.toString(),
+                    winner: winner,
+                    gameType: "Blitz"
+                }
+                $.ajax({
+                    url: "/VsAi?handler=SaveGame",
+                    type: "POST",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN",
+                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(datajson),
+                    success: function (response) {
+
+                    }
+
+                });
+            }
+        }
+        });
+
+        $(window).on('load', function () { 
+            $('#status').fadeOut(); 
+            $('#preloader').delay(350).fadeOut('slow'); 
+            $('#content').delay(350).css({ 'overflow': 'visible' });
 
 
+        })
     </script>
 
 }

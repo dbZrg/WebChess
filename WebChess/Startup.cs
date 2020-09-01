@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Serialization;
+using WebChess.Areas.Identity.Data;
 
 namespace WebChess
 {
@@ -30,15 +31,18 @@ namespace WebChess
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            //services.AddDbContext<ApplicationDbContext>(options =>
+            //    options.UseSqlServer(
+            //        Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<UserContext>(options =>
+                   options.UseSqlServer(Configuration.GetConnectionString("UserContextConnection")));
+            services.AddDefaultIdentity<WebChessUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddEntityFrameworkStores<UserContext>();
             services.AddRazorPages();
 
             services.AddDbContext<WebChessContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("WebChessContext")));
+            
 
             services.AddAntiforgery(o => o.HeaderName = "XSRF-TOKEN");
         }

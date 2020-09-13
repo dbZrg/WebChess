@@ -31,24 +31,49 @@ namespace WebChess
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            
             //services.AddDbContext<ApplicationDbContext>(options =>
             //    options.UseSqlServer(
             //        Configuration.GetConnectionString("DefaultConnection")));
             services.AddDbContext<UserContext>(options =>
                    options.UseSqlServer(Configuration.GetConnectionString("UserContextConnection")));
-            services.AddDefaultIdentity<WebChessUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddDefaultIdentity<WebChessUser>(options => options.SignIn.RequireConfirmedAccount = false)
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<UserContext>();
-            services.AddRazorPages();
-
             services.AddDbContext<WebChessContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("WebChessContext")));
             
 
+            services.AddRazorPages();
             services.AddAntiforgery(o => o.HeaderName = "XSRF-TOKEN");
         }
 
+        private async Task CreateUserRoles(IServiceProvider serviceProvider)
+        {
+            var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var UserManager = serviceProvider.GetRequiredService<UserManager<WebChessUser>>();
+
+            IdentityResult roleResult;
+            //Adding Admin Role
+            var roleCheck = await RoleManager.RoleExistsAsync("Admin");
+            if (!roleCheck)
+            {
+                //create the roles and seed them to the database
+                roleResult = await RoleManager.CreateAsync(new IdentityRole("Admin"));
+            }
+            //Assign Admin role to the main User here we have given our newly registered 
+            //login id for Admin management
+            WebChessUser user = await UserManager.FindByEmailAsync("darij.b@gmail.com");
+            if(user == null)
+            {
+                user = new WebChessUser { UserName = "Admin", Email = "admin@email.com", EmailConfirmed = true, elo = 1500  };
+                await UserManager.CreateAsync(user, "Abcabc1.");
+            }
+            await UserManager.AddToRoleAsync(user, "Admin");
+        }
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
             {
@@ -74,6 +99,8 @@ namespace WebChess
             {
                 endpoints.MapRazorPages();
             });
+
+            CreateUserRoles(serviceProvider).Wait();
         }
     }
 }

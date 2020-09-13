@@ -4,7 +4,9 @@
 @{
     ViewData["Title"] = "Index";
 }
-
+@using Microsoft.AspNetCore.Identity
+@using WebChess.Areas.Identity.Data
+@inject UserManager<WebChessUser> UserManager
 
 <div class="container-fluid">
     <div class="row">
@@ -64,43 +66,49 @@
                                 </td>
                                 <td>
                                     <a asp-page="./Analyse" asp-route-id="@item.ID"><i class="fas fa-cogs p-2"></i></a>
-
-                                    @*<a asp-page="./Edit" asp-route-id="@item.ID">Edit</a> |
-                            <a asp-page="./Details" asp-route-id="@item.ID">Details</a> |
-                            <a asp-page="./Delete" asp-route-id="@item.ID">Delete</a>*@
+                                    @if (User.Identity.Name != null)
+                                    {
+                                    var user = await UserManager.FindByNameAsync(User.Identity.Name);
+                                    @if (await UserManager.IsInRoleAsync(user, "Admin"))
+                                    {
+                                        <a asp-page="./Edit" asp-route-id="@item.ID">Edit</a>
+                                        <a asp-page="./Details" asp-route-id="@item.ID">Details</a>
+                                        <a asp-page="./Delete" asp-route-id="@item.ID">Delete</a>
+                                    }
+                                        }
                                 </td>
                             </tr>
                         }
                     </tbody>
                 </table>
             </div>
-            </div>
-            <div class="col-sm-3">
-                <div class="row align-items-center sticky">
+        </div>
+        <div class="col-sm-3">
+            <div class="row align-items-center sticky">
 
-                    <div class="row">
-                        <div id="blackName" class="col">
-                            <h4>Black</h4>
-                        </div>
-                        <div class="col">
-
-                        </div>
+                <div class="row">
+                    <div id="blackName" class="col">
+                        <h4>Black</h4>
                     </div>
-                    <div id="myBoard" class="board-fixed"></div>
-                    <div class="row">
-                        <div id="whiteName" class="col">
-                            <h4>White</h4>
-                        </div>
-                        <div class="col">
-
-                        </div>
-
+                    <div class="col">
 
                     </div>
+                </div>
+                <div id="myBoard" class="board-fixed"></div>
+                <div class="row">
+                    <div id="whiteName" class="col">
+                        <h4>White</h4>
+                    </div>
+                    <div class="col">
+
+                    </div>
+
 
                 </div>
+
             </div>
         </div>
+    </div>
 
 </div>
 
@@ -117,14 +125,14 @@
 
                 var pgn = currentRow.find("#item_pgn").val(); // get current row 1st table cell TD value
                 fens = currentRow.find("#item_fens").val(); // get current row 2nd table cell TD value
-                
+
                 var whiteN = currentRow.find("td:eq(1)").text(); // get current row 2nd TD
                 var blackN = currentRow.find("td:eq(2)").text(); // get current row 3rd TD
                 fens = fens.split(",")
                 pgn = pgn.split(" ")
                 var lastPos = fens[fens.length - 1]
                 board.position(lastPos)
-                
+
                 $("#whiteName h4").replaceWith("<h4>" + whiteN + "</h4>");
                 $("#blackName h4").replaceWith("<h4>" + blackN + "</h4>");
 
@@ -161,36 +169,36 @@
                 //        moveNum = 0;
                 //        moveid++;
                 //    }}
-                    
 
-                
-                
+
+
+
 
             });
 
-        //    $("#movesContainer .moveCont").on("click", "div", function (event) {
-        //        var Id = jQuery(this).attr("id");
-        //        $('.movesNot').each(function () {
-        //            let elem = $(this);
-        //            elem.css('background-color', 'white');
-        //        });
-        //        $(this).css('background-color', 'grey');
+            //    $("#movesContainer .moveCont").on("click", "div", function (event) {
+            //        var Id = jQuery(this).attr("id");
+            //        $('.movesNot').each(function () {
+            //            let elem = $(this);
+            //            elem.css('background-color', 'white');
+            //        });
+            //        $(this).css('background-color', 'grey');
 
-        //        Id = Id.slice(0, -1);
-        //        board.position(fens[Id]);
+            //        Id = Id.slice(0, -1);
+            //        board.position(fens[Id]);
 
 
-        //    });
+            //    });
 
-        
+
         });
 
 
         var config = {
-           
+
             showNotation: false,
             position: 'start'
-            
+
         }
         board = Chessboard('myBoard', config)
     </script>

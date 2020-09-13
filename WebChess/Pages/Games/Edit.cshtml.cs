@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -11,6 +12,7 @@ using WebChess.Models;
 
 namespace WebChess.Pages.Games
 {
+    [Authorize(Roles = "Admin")]
     public class EditModel : PageModel
     {
         private readonly WebChess.Data.WebChessContext _context;

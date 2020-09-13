@@ -1,5 +1,14 @@
 ﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
 for details on configuring this project to bundle and minify static web assets. */
+.text-info {
+    padding-right: 12px;
+}
+
+#searchInfo {
+    width: 100%;
+    word-break: break-all;
+}
+
 .sticky{
     top:10%;
     position: sticky; 
@@ -19,49 +28,48 @@ i {
     display: none;
 }
 
-    .custom-radios input[type="radio"] + label {
-        color: #333;
-        font-family: Arial, sans-serif;
-        font-size: 14px;
-    }
+.custom-radios input[type="radio"] + label {
+    color: #333;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
 
-        .custom-radios input[type="radio"] + label span {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            margin: -1px 4px 0 0;
-            vertical-align: middle;
-            cursor: pointer;
-            border-radius: 50%;
-            border: 2px solid #FFFFFF;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.33);
-            background-repeat: no-repeat;
-            background-position: center;
-            text-align: center;
-            line-height: 44px;
-        }
+.custom-radios input[type="radio"] + label span {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    margin: -1px 4px 0 0;
+    vertical-align: middle;
+    cursor: pointer;
+    border-radius: 50%;
+    border: 2px solid #FFFFFF;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.33);
+    background-repeat: no-repeat;
+    background-position: center;
+    text-align: center;
+    line-height: 44px;
+}
 
-            .custom-radios input[type="radio"] + label span img {
-                opacity: 0;
-                transition: all .3s ease;
-            }
+.custom-radios input[type="radio"] + label span img {
+    opacity: 0;
+    transition: all .3s ease;
+}
 
-    .custom-radios input[type="radio"]#color-1 + label span {
-        background-color: #dedede;
-    }
+.custom-radios input[type="radio"]#color-1 + label span {
+    background-color: #dedede;
+}
 
-    .custom-radios input[type="radio"]#color-2 + label span {
-        background-color: black;
-    }
+.custom-radios input[type="radio"]#color-2 + label span {
+    background-color: black;
+}
 
-
-    .custom-radios input[type="radio"]:checked + label span {
-        opacity: 1;
-        background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/242518/check-icn.svg) center center no-repeat;
-        width: 40px;
-        height: 40px;
-        display: inline-block;
-    }
+.custom-radios input[type="radio"]:checked + label span {
+    opacity: 1;
+    background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/242518/check-icn.svg) center center no-repeat;
+    width: 40px;
+    height: 40px;
+    display: inline-block;
+}
 
 
 .highlight-white {
@@ -104,7 +112,6 @@ i {
     right: 0;
     bottom: 0;
     background-color: #fff;
-
     z-index: 99;
 
 }
@@ -114,21 +121,14 @@ i {
     height: 500px;
     position: absolute;
     left: 50%;
-    /* centers the loading animation horizontally one the screen */
     top: 50%;
-    /* centers the loading animation vertically one the screen */
     background-image: url(/img/Preloader/bishop.gif);
-    /* path to your loading animation */
     background-repeat: no-repeat;
     background-position: center;
     margin: -100px 0 0 -100px;
-    /* is width and height divided by two */
 }
 
-#searchInfo p {
-    word-wrap: break-word;
-    width:100%;
-}
+
 
 .progress-bar {
     background-color: lightgrey;
@@ -194,29 +194,28 @@ a.navbar-brand {
     word-break: break-all;
 }
 
-/* Provide sufficient contrast against white background */
+
 a {
     text-decoration: none;
     color: #232323;
     cursor:pointer;
 }
-    /* unvisited link */
+
     a:link {
         text-decoration: none;
     }
 
-    /* visited link */
+
     a:visited {
         text-decoration: none;
     }
 
-    /* mouse over link */
+
     a:hover {
         text-decoration: none;
         color: black;
     }
 
-    /* selected link */
     a:active {
         text-decoration: none;
     }
@@ -224,7 +223,6 @@ a {
     color: #343a40;
     background-color: #efefef;
     border-color: #e6e6e6;
-
     border-radius: 0px;
 }
 

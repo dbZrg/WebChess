@@ -9,7 +9,7 @@ using WebChess.Areas.Identity.Data;
 
 namespace WebChess.Data
 {
-    public class UserContext : IdentityDbContext<WebChessUser>
+    public class UserContext : IdentityDbContext<WebChessUser, IdentityRole, string>
     {
         public UserContext(DbContextOptions<UserContext> options)
             : base(options)
@@ -23,5 +23,6 @@ namespace WebChess.Data
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);
         }
+        public DbSet<WebChessUser> UserList { get; set; }
     }
 }

@@ -12,21 +12,17 @@
 <div class="modal fade" id="engineChange" tabindex="-1" role="dialog" aria-labelledby="Engine config" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
+         
             <div class="modal-body">
                 <div class="slidecontainer">
+                    <h3>Engine search depth</h3>
                     <input type="range" min="5" max="30" value="20" class="slider" id="depthControl">
-                    Engine search depth:<span class="range-value">20</span>
+                   <div class="range-value">20</div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button id="saveButton" type="button" class="btn btn-primary">Save changes</button>
+                <button id="saveButton" type="button" class="btn btn-secondary">Save changes</button>
             </div>
         </div>
     </div>
@@ -62,7 +58,7 @@
 
 
 
-        <div class="col-sm-4">
+        <div class="col-sm-4 pt-5">
             <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#engineChange">
                Engine config
             </button>
@@ -93,15 +89,23 @@
                 </div>
             </div>
 
-                <div id="depth" class="row">
-                    <div class="spinner-border spinner-border-sm">
-                        <span class="sr-only">Calculating...</span>
-                    </div>
+            <div class="row">
+                <div class="text-info">Depth: </div>
+                <div id="depth"></div>
+            </div>
+                <div class="row">
+                    <div class="text-info">Best variation: </div>
+                    <div id="searchInfo"></div>
                 </div>
-                <div id="searchInfo" class="row"><p></p></div>
-                <div id="bestMove" class="row"></div>
+                <div class="row">
+                    <div class="text-info">Best Move: </div>
+                    <div id="bestMove"></div>
+                </div>
 
-                <div id="eval" class="row"></div>
+                <div class="row">
+                    <div class="text-info">Evaluation: </div>
+                    <div id="eval"></div>
+                </div>
 
             </div>
         </div>
@@ -172,7 +176,7 @@
                         floatEval = -floatEval;
                     }
                     $('.progress-bar').css("width", (floatEval + 50) + "%").text(floatEval)
-                    $('#searchInfo p').text(bestVar)
+                    $('#searchInfo').text(bestVar)
                     $('#depth').text(depth)
                     $('#eval').text(floatEval)
 

@@ -1,0 +1,203 @@
+﻿@page
+@model WebChess.Pages.UsersListModel
+@{
+    ViewData["Title"] = "UsersList";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+@Html.AntiForgeryToken()
+
+<div id="element" class="toast" role="status" aria-live="polite" data-delay="10000" style="position: absolute; top: 0; right: 0;">
+    <div class="toast-header">
+
+
+
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="toast-body">
+        User added to database!
+    </div>
+</div>
+<div id="element2" class="toast" role="status" aria-live="polite" data-delay="10000" style="position: absolute; top: 0; right: 0;">
+    <div class="toast-header">
+
+
+
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="toast-body">
+        User removed from database!
+    </div>
+</div>
+
+<div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="AddUser" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <form method="post">
+                    <h4>Create a new account.</h4>
+                    <hr />
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="Input.Email"></label>
+                        <input asp-for="Input.Email" class="form-control" />
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Input.Name"></label>
+                        <input asp-for="Input.Name" class="form-control" />
+                        <span asp-validation-for="Input.Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Input.Password"></label>
+                        <input asp-for="Input.Password" class="form-control" />
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
+
+                    <button id="addUser" type="button" class="btn btn-secondary">Add user</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12">
+            <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#addUserModal">
+                <i class="fa fa-plus mr-2" aria-hidden="true"></i>Add user
+            </button>
+            <div class="table-responsive">
+                <table id="Table" class="table table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>
+                                UserName
+                            </th>
+                            <th>
+                                Email
+                            </th>
+                            <th>
+                                Elo
+                            </th>
+                            <th>
+                                Wins
+                            </th>
+                            <th>
+                                Losses
+                            </th>
+                            <th>
+                                Draws
+                            </th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.WebChessUsers)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.UserName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Email)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.elo)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.wins)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.losses)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.draws)
+                                </td>
+                                <td>
+                                    <button class="btn btn-dark delete" data-name=@item.UserName value="Delete">Delete</button>
+
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+    </div>
+
+</div>
+@section scripts {
+    <script>
+
+        $(document).ready(function () {
+
+            $("#addUser").click(function () {
+                $('#addUserModal').modal('hide');
+                var datajson = {
+                    Email: $("#Input_Email").val(),
+                    Name: $("#Input_Name").val(),
+                    Password: $("#Input_Password").val()
+                }
+                $.ajax({
+                    url: "/UsersList?handler=AddUser",
+                    type: "POST",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN",
+                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(datajson),
+                    success: function (response) {
+                        if (response == true) {
+                            var b = $('<button/>').attr({
+
+                                class: "btn btn-dark delete",
+                                "data-name": datajson.Name,
+                                value: 'Delete'
+                            });
+                            $("#element").toast("show");
+                            $("#Table tbody").append(
+                                "<tr><td>" + datajson.Name + "</td><td>" + datajson.Email +
+                                "</td><td>1500</td><td>0</td><td>0</td><td>0</td><td><button class='btn btn-dark delete' data-name='"+ datajson.Name +"' value='Delete'>Delete</button> </td></tr>").fadeIn(3000);
+                        }
+                    }
+
+                });
+            });
+          
+
+            $(document).on('click', '.delete', function () {
+                var name = $(this).data('name');
+                //$(this).closest("tr").remove();
+                $(this).closest("tr").fadeOut(300, function () { $(this).remove(); });
+                $.ajax({
+                    url: "/UsersList?handler=Delete",
+                    type: "POST",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN",
+                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    data: {
+                        userName: name
+                    },
+                    success: function (response) {
+                        $("#element2").toast("show");
+
+                    }
+
+                });
+            });
+        });
+    </script>
+}

@@ -81,7 +81,7 @@
                     }
                     else
                     {
-                        <h2>Player</h2>
+                          <h2>Player</h2>
                     }
 
                 </div>
@@ -125,15 +125,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-12 order-1 nopadding">
-                    <div class="btn-group controls" role="group" aria-label="Controls">
-                        <button id="backEnd" type="button" class="btn btn-secondary">&#x21E4;</button>
-                        <button id="backOne" type="button" class="btn btn-secondary">&#x2190;</button>
-                        <button id="forOne" type="button" class="btn btn-secondary">&#x2192;</button>
-                        <button id="forEnd" type="button" class="btn btn-secondary">&#x21E5;</button>
-                    </div>
-
-                </div>
+                
             </div>
         </div>
     </div>
@@ -298,7 +290,8 @@
             seconds = (seconds < 10) ? '0' + seconds : seconds;
             newTime = minutes + ':' + seconds;
             return newTime;
-        }
+            }
+
 
         //board events
         function onChange(oldPos, newPos) {
@@ -442,7 +435,8 @@
         board = Chessboard('myBoard', config);
         $(window).resize(board.resize);
 
-        function getWinner() {
+            function getWinner() {
+                $("#resign").attr('disabled', 'disabled');
             var winner;
             if (resign == true) {
                 if (playerColor == "w") {

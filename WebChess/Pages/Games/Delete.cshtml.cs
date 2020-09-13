@@ -7,11 +7,14 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using WebChess.Data;
 using WebChess.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebChess.Pages.Games
 {
+    [Authorize(Roles = "Admin")]
     public class DeleteModel : PageModel
     {
+
         private readonly WebChess.Data.WebChessContext _context;
 
         public DeleteModel(WebChess.Data.WebChessContext context)

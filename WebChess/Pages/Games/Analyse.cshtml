@@ -219,28 +219,28 @@
             var moveid = 0;
             for (i = 0; i <= pgn.length - 1; i++) {
                 if (moveNum == 0) {
-                    jQuery('<div/>', {
+                    $('<div/>', {
                         id: i + "m",
                         "class": 'movesNot'
                     }).appendTo('#moveNum');
-                    jQuery("#" + i + "m").html(pgn[i]);
+                    $("#" + i + "m").html(pgn[i]);
                     moveNum++;
                 }
                 else if (moveNum == 1) {
-                    jQuery('<div/>', {
+                    $('<div/>', {
                         id: moveid + "p",
                         "class": 'movesNot'
                     }).appendTo('#white');
-                    jQuery("#" + moveid + "p").html(pgn[i]);
+                    $("#" + moveid + "p").html(pgn[i]);
                     moveNum++;
                     moveid++;
                 }
                 else if (moveNum == 2) {
-                    jQuery('<div/>', {
+                    $('<div/>', {
                         id: moveid + "p",
                         "class": 'movesNot'
                     }).appendTo('#black');
-                    jQuery("#" + moveid + "p").html(pgn[i]);
+                    $("#" + moveid + "p").html(pgn[i]);
                     moveNum = 0;
                     moveid++;
                 }
@@ -258,7 +258,7 @@
             });
 
             $("#movesContainer .moveCont").on("click", "div", function (event) {
-                var Id = jQuery(this).attr("id");
+                var Id = $(this).attr("id");
                 currentMove = Id.slice(0, -1);
                 currentPos = fens[currentMove]
                 game.load(currentPos)

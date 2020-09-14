@@ -155,7 +155,7 @@
 
         //view position clicking on move notation
         $("#movesContainer .moveCont").on("click", "div", function (event) {
-            var Id = jQuery(this).attr("id");
+            var Id = $(this).attr("id");
             Id = Id.slice(0, -1);
             board.position(movesFen[Id]);
             $(this).css('background-color', 'white');
@@ -353,24 +353,24 @@
             var move = game.move(possibleMoves[randomIdx]);
 
             if (board.orientation() == "black") {
-                jQuery('<div/>', {
+                $('<div/>', {
                     id: counter + "p",
                     "class": 'movesNot'
                 }).appendTo('#white');
-                jQuery("#" + counter + "p").html(move.piece + move.to);
+                $("#" + counter + "p").html(move.piece + move.to);
 
-                jQuery('<div/>', {
+                $('<div/>', {
                     id: counter + "m",
                     "class": 'movesNot'
                 }).appendTo('#moveNum');
-                jQuery("#" + counter + "m").html((counter + 1) / 2 + 0.5)+".";
+                $("#" + counter + "m").html((counter + 1) / 2 + 0.5)+".";
 
             } else {
-                jQuery('<div/>', {
+                $('<div/>', {
                     id: counter + "p",
                     "class": 'movesNot'
                 }).appendTo('#black');
-                jQuery("#" + counter + "p").html(move.piece + move.to);
+                $("#" + counter + "p").html(move.piece + move.to);
             }
 
             board.position(game.fen());
@@ -391,24 +391,24 @@
 
 
             if (board.orientation() == "white") {
-                jQuery('<div/>', {
+                $('<div/>', {
                     id: counter + "p",
                     "class": 'movesNot'
                 }).appendTo('#white');
-                jQuery("#" + counter + "p").html(move.san);
+                $("#" + counter + "p").html(move.san);
 
 
-                jQuery('<div/>', {
+                $('<div/>', {
                     id: counter + "m",
                     "class": 'movesNot'
                 }).appendTo('#moveNum');
-                jQuery("#" + counter + "m").html((counter + 1) / 2 + 0.5+".");
+                $("#" + counter + "m").html((counter + 1) / 2 + 0.5+".");
             } else {
-                jQuery('<div/>', {
+                $('<div/>', {
                     id: counter + "p",
                     "class": 'movesNot'
                 }).appendTo('#black');
-                jQuery("#" + counter + "p").html(move.san);
+                $("#" + counter + "p").html(move.san);
 
             }
             movesFen.push(game.fen());

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -13,10 +10,10 @@ namespace WebChess.Pages
     public class VsAiModel : PageModel
     {
         private readonly UserManager<WebChessUser> _userManager;
-        private readonly WebChess.Data.WebChessContext _context;
+        private readonly Data.WebChessContext _context;
         
 
-        public VsAiModel(UserManager<WebChessUser> userManager, WebChess.Data.WebChessContext context)
+        public VsAiModel(UserManager<WebChessUser> userManager, Data.WebChessContext context)
         {
             _userManager = userManager;
             _context = context;
@@ -25,7 +22,6 @@ namespace WebChess.Pages
         {
 
         }
-        [BindProperty]
         public ChessGame ChessGame { get; set; }
 
         public async Task<JsonResult> OnPostSaveGameAsync([FromBody] ChessGame json)

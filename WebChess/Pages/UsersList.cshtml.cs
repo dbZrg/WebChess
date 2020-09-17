@@ -62,10 +62,10 @@ namespace WebChess.Pages
             var user = await _userManager.FindByNameAsync(userName);
             if(user != null)
             {
-                await _userManager.DeleteAsync(user);
-                return new JsonResult("Uspjesno izbrisan");
+                var result = await _userManager.DeleteAsync(user);
+                return new JsonResult(result.Succeeded);
             }
-            return new JsonResult("Neuspjelo");
+            return new JsonResult("No user");
 
         }
 

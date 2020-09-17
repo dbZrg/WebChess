@@ -31,10 +31,7 @@ namespace WebChess
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            
-            //services.AddDbContext<ApplicationDbContext>(options =>
-            //    options.UseSqlServer(
-            //        Configuration.GetConnectionString("DefaultConnection")));
+
             services.AddDbContext<UserContext>(options =>
                    options.UseSqlServer(Configuration.GetConnectionString("UserContextConnection")));
             services.AddDefaultIdentity<WebChessUser>(options => options.SignIn.RequireConfirmedAccount = false)
@@ -62,7 +59,6 @@ namespace WebChess
                 roleResult = await RoleManager.CreateAsync(new IdentityRole("Admin"));
             }
             //Assign Admin role to the main User here we have given our newly registered 
-            //login id for Admin management
             WebChessUser user = await UserManager.FindByEmailAsync("darij.b@gmail.com");
             if(user == null)
             {

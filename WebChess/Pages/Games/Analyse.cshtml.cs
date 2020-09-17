@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -11,9 +9,9 @@ namespace WebChess.Pages.Games
 {
     public class AnalyseModel : PageModel
     {
-        private readonly WebChess.Data.WebChessContext _context;
+        private readonly Data.WebChessContext _context;
 
-        public AnalyseModel(WebChess.Data.WebChessContext context)
+        public AnalyseModel(Data.WebChessContext context)
         {
             _context = context;
         }

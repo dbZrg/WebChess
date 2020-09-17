@@ -16,7 +16,7 @@ namespace WebChess.Models
                 serviceProvider.GetRequiredService<
                     DbContextOptions<WebChessContext>>()))
             {
-                // Look for any movies.
+                
                 if (context.ChessGame.Any())
                 {
                     return;   // DB has been seeded

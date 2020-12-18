@@ -1,4 +1,4 @@
 # WebChess
 Not finished, currently working on this project.
 Present features:
-![WebchessFeatures.gif](https://s8.gifyu.com/images/WebchessFeatures.gif)
+<a href="https://gifyu.com/image/CLNz"><img src="https://s8.gifyu.com/images/WebchessFeatures.gif" alt="WebchessFeatures.gif" border="0" /></a>
